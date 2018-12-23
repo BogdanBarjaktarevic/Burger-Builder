@@ -1,20 +1,14 @@
 import React, { Component } from 'react';
-import {Route} from 'react-router-dom';
+import {Route, Redirect} from 'react-router-dom';
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
 import ContactData from '../../containers/Checkout/ContactData/ContactData';
 import { connect } from 'react-redux';
+import * as actions from '../../store/actions/index';
 
 
 
 class Checkout extends Component {
-    
 
-
-    state = {
-        ingredients: null,
-        totalPrice: 0,
-        loading: false
-    }
 
     cancelHandlerModal = () => {
         this.props.history.goBack()
@@ -27,24 +21,31 @@ class Checkout extends Component {
     
 
     render(){
-        return (
-            <div>
-                <CheckoutSummary 
-                    ingredients={this.props.stateIngredients}
-                    cancelHandler={this.cancelHandlerModal}
-                    continueHandler={this.continueHandlerModal}
+        let summary = <Redirect to="/" />
+        if(this.props.stateIngredients){
+            const purchasedRedirect = this.props.statePurchased ? <Redirect to="/" /> : null;
+            summary = (
+                <div>
+                    {purchasedRedirect}
+                    <CheckoutSummary 
+                        ingredients={this.props.stateIngredients}
+                        cancelHandler={this.cancelHandlerModal}
+                        continueHandler=                            {this.continueHandlerModal}
                     />
-                    <Route path={this.props.match.path + '/get-contact'} 
-                           component={ContactData}
+                    <Route path={this.props.match.path +            '/get-contact'} 
+                        component={ContactData}
                     />
-            </div>
-        )
+                </div>
+            )
+        }
+        return summary;
     }
 }
 
 const mapStateToProps = state => {
     return {
-      stateIngredients: state.ingredients,
+      stateIngredients: state.bbRed.ingredients,
+      statePurchased: state.orderRed.purchased
     }
   }
 
