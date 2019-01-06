@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import classes from "./Layout.module.css";
 import Toolbar from "../Navigation/Toolbar/Toolbar";
 import SideDrawer from "../Navigation/SideDrawer/SideDrawer";
+import {connect} from 'react-redux';
+import { withRouter } from "react-router";
 
 class Layout extends Component {
 
@@ -22,12 +24,18 @@ class Layout extends Component {
   render() {
     return (
       <>
-        <Toolbar clicked={this.sideDrawerOpenHandler} />
-        <SideDrawer closed={this.sideDrawerClosedHandler} open={this.state.showSideDrawer} />
+        <Toolbar clicked={this.sideDrawerOpenHandler} isAuth={this.props.isAuth}/>
+        <SideDrawer closed={this.sideDrawerClosedHandler} open={this.state.showSideDrawer} isAuth={this.props.isAuth}/>
         <main className={classes.Content}>{this.props.children}</main>
       </>
     );
   }
 }
 
-export default Layout;
+const mapStateToProps = state => {
+  return {
+    isAuth: state.authRed.token !== null
+  }
+}
+
+export default withRouter(connect(mapStateToProps)(Layout));

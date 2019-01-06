@@ -4,7 +4,8 @@ const initialState = {
     loading: false,
     error: null,
     token: null,
-    userId: null
+    userId: null,
+    authRoute: '/'
 }
 
 const reducer = (state = initialState, action) => {
@@ -32,6 +33,19 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 loading: false,
                 error: action.error.response.data.error.message
+            }
+
+        case actionTypes.AUTH_LOGOUT:
+            return {
+                ...state,
+                token: null,
+                userId: null
+            }
+
+        case actionTypes.SET_AUTH_ROUTE: 
+            return {
+                ...state,
+                authRoute: action.path
             }
 
         default: 

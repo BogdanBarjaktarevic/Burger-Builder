@@ -8,6 +8,7 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
 import { connect } from 'react-redux';
 import * as actionCreators from '../../store/actions/index';
+import { Redirect } from 'react-router-dom';
 
 class BurgerBuilder extends Component {
   
@@ -34,7 +35,13 @@ class BurgerBuilder extends Component {
   }
 
   modalShowHandler = () => {
-    this.setState({ purchasing: true });
+    if(this.props.isAuth){
+      this.setState({ purchasing: true });
+    }else{
+      this.props.onSetAuthRoute('/checkout')
+      this.props.history.push('/auth');
+    }
+    
   };
 
   modalCancelHandler = () => {
@@ -67,6 +74,7 @@ class BurgerBuilder extends Component {
             removeIngredient={this.props.onRemoveIngredientHandler}
             disabled={disabledInfo}
             price={this.props.statePrice}
+            isAuth={this.props.isAuth}
             purchasable={this.purchasableBurger(this.props.stateIngredients)}
             ordered={this.modalShowHandler}
           />
@@ -101,7 +109,8 @@ const mapStateToProps = state => {
   return {
     stateIngredients: state.bbRed.ingredients,
     statePrice: state.bbRed.totalPrice,
-    stateError: state.bbRed.error
+    stateError: state.bbRed.error,
+    isAuth: state.authRed.token !== null
   }
 }
 
@@ -110,7 +119,8 @@ const mapDispatchToProps = dispatch => {
     onAddIngredientHandler: (ingType) => dispatch(actionCreators.addIngredient(ingType)),
     onRemoveIngredientHandler: (ingType) => dispatch(actionCreators.removeIngredient(ingType)),
     fetchIngredientsHandler: () => dispatch(actionCreators.fetchIngredients()),
-    onInitPurchase: () => dispatch(actionCreators.purchaseInit())
+    onInitPurchase: () => dispatch(actionCreators.purchaseInit()),
+    onSetAuthRoute: (path) => dispatch(actionCreators.setAuthRoute(path))
   }
 }
 

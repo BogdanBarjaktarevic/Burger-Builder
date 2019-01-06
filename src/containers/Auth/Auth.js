@@ -4,11 +4,19 @@ import classes from './Auth.module.css';
 import {connect} from 'react-redux';
 import * as actions from '../../store/actions/index';
 
+import { Redirect } from 'react-router-dom';
+
 import Spinner from '../../components/UI/Spinner/Spinner';
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 
 class Auth extends Component {
+
+    componentDidMount(){
+      if(this.props.authRoute !== '/' && !this.props.building){
+        this.props.setAuthRoute()
+      }
+    }
 
     state = {
         controls: {
@@ -104,6 +112,11 @@ class Auth extends Component {
       });
     }
 
+    let redirect = null;
+    if(this.props.isAuth){
+      redirect = <Redirect to={this.props.authRoute} />
+    }
+
     let form = <Spinner />;
     if(!this.props.loading){
       form = (
@@ -132,9 +145,10 @@ class Auth extends Component {
 
         return (
             <div className={classes.Auth}>
+                {redirect}
                 {this.props.error}
                 {form}
-                <Button type="Danger" clicked={this.signingHandler}>{this.state.isSignup ? "SIGN UP" : "SIGN IN"}</Button>
+                <Button type="Danger" clicked={this.signingHandler}>Change to {this.state.isSignup ? "SIGN IN" : "SIGN UP"}</Button>
             </div>
         )
     }
@@ -143,13 +157,17 @@ class Auth extends Component {
 const mapStateToProps = state => {
   return {
       loading: state.authRed.loading,
-      error: state.authRed.error
+      error: state.authRed.error,
+      isAuth: state.authRed.token !== null,
+      authRoute: state.authRed.authRoute,
+      building: state.bbRed.building
   }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAuth: (email, password, isSignup) => dispatch(actions.auth(email, password, isSignup))
+        onAuth: (email, password, isSignup) => dispatch(actions.auth(email, password, isSignup)),
+        setAuthRoute: () => dispatch(actions.setAuthRoute('/'))
     }
 }
 
